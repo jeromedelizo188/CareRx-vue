@@ -190,3 +190,24 @@ th {
 .slide-in-up {
   animation: slideInUp 0.5s ease-out;
 }
+/* Must be globally accessible or in the component's <style> block */
+.btn { 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.3s; 
+    border: none; 
+    font-family: 'Montserrat', sans-serif; 
+    /* Important for aligning the icon next to the text */
+    display: inline-flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+.btn-primary { 
+    background-color: var(--primary-color); /* Usually a green/accent color */
+    color: white; 
+}
+.btn-primary:hover { 
+    background-color: var(--primary-dark); 
+}

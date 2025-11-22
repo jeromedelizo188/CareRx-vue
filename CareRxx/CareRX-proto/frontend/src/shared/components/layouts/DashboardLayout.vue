@@ -8,11 +8,10 @@
         <ul class="sidebar-menu">
           <li><router-link :to="`/dashboard/${userId}`"><i class="fas fa-home"></i> Dashboard</router-link></li>
           <li><router-link :to="`/appointments/${userId}`"><i class="fas fa-calendar-alt"></i> Appointments</router-link></li>
-          <!-- In the <ul class="sidebar-menu"> -->
           <li><router-link :to="`/consultations/${userId}`"><i class="fas fa-video"></i> Consultations</router-link></li>
-          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-file-medical"></i> Medical Records</a></li>
-          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-prescription"></i> E-Prescriptions</a></li>
-          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-user"></i> My Profile</a></li>
+          <li><router-link :to="`/medical-records/${userId}`"><i class="fas fa-file-medical"></i> Medical Records</router-link></li>
+          <li><router-link :to="`/e-prescriptions/${userId}`"><i class="fas fa-prescription"></i> E-Prescriptions</router-link></li>
+          <li><router-link :to="`/patient-profile/${userId}`"><i class="fas fa-user"></i> My Profile</router-link></li>
           <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-cog"></i> Settings</a></li>
         </ul> 
       <div class="sidebar-footer">

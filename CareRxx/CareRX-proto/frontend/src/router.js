@@ -6,6 +6,9 @@ import Login from './auth/views/Login.vue'
 import PatientDashboard from './patient-dashboard/PatientDashboard.vue' 
 import Appointments from './appointments/Appointments.vue'
 import Consultations from './consultations/Consultations.vue'
+import MedicalRecords from './medical-records/MedicalRecords.vue'
+import EPrescriptions from './e-prescriptions/EPrescriptions.vue'
+import PatientProfile from './patient-profile/PatientProfile.vue'
 
 const routes = [
   {
@@ -42,6 +45,21 @@ const routes = [
   path: '/consultations/:id',
   component: Consultations,
   meta: { title: 'Consultations - CareRX' }
+},
+{
+  path: '/medical-records/:id',
+  component: MedicalRecords,
+  meta: { title: 'Medical Records - CareRX' }
+},
+{
+  path: '/e-prescriptions/:id',
+  component: EPrescriptions,
+  meta: { title: 'E-Prescriptions - CareRX' }
+},
+{
+  path: '/patient-profile/:id',
+  component: PatientProfile,
+  meta: { title: 'My Profile - CareRX' }
 }
 ]
 

@@ -171,4 +171,117 @@ router.get('/:id/consultations', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch consultations data.', details: error.message });
   }
 });
+
+
+// GET /api/patients/:id/medical-records - Get patient data and medical records
+router.get('/:id/medical-records', async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // 1. Get patient profile data for the Health Snapshot
+    const [patientResult] = await db.execute(
+      `SELECT first_name, last_name, blood_type, allergies FROM patients WHERE id = ?`,
+      [patientId]
+    );
+    const patientData = patientResult[0];
+
+    if (!patientData) {
+      return res.status(404).json({ error: 'Patient not found.' });
+    }
+
+    // 2. Get all medical records for the patient
+    // NOTE: This assumes a 'medical_records' table exists. Adjust as needed.
+    const [recordsResult] = await db.execute(
+      `SELECT id, title, date, doctor, facility, type FROM medical_records WHERE patient_id = ? ORDER BY date DESC`,
+      [patientId]
+    );
+
+    res.json({
+      patientData,
+      medicalRecords: recordsResult
+    });
+
+  } catch (error) {
+    console.error('Medical Records data error:', error);
+    res.status(500).json({ error: 'Failed to fetch medical records data.', details: error.message });
+  }
+});
+
+// GET /api/patients/:id/prescriptions - Get patient data and prescriptions
+router.get('/:id/prescriptions', async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // 1. Get patient profile data for display
+    const [patientResult] = await db.execute(
+      `SELECT first_name FROM patients WHERE id = ?`,
+      [patientId]
+    );
+    const patientData = patientResult[0];
+
+    if (!patientData) {
+      return res.status(404).json({ error: 'Patient not found.' });
+    }
+
+    // 2. Get all prescriptions for the patient
+    // NOTE: This assumes a 'prescriptions' table exists. Adjust as needed.
+    const [prescriptionsResult] = await db.execute(
+      `SELECT id, medication_name, prescribed_date, dosage, doctor_name, status FROM prescriptions WHERE patient_id = ? ORDER BY prescribed_date DESC`,
+      [patientId]
+    );
+
+    res.json({
+      patientData,
+      prescriptions: prescriptionsResult
+    });
+
+  } catch (error) {
+    console.error('Prescriptions data error:', error);
+    res.status(500).json({ error: 'Failed to fetch prescriptions data.', details: error.message });
+  }
+});
+
+// GET /api/patients/:id/profile - Get all data for a specific patient's profile
+router.get('/:id/profile', async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Fetch all relevant patient data in one query
+    const [patientResult] = await db.execute(
+      `SELECT 
+        first_name, 
+        last_name, 
+        date_of_birth, 
+        gender, 
+        street_address, 
+        city, 
+        state, 
+        zip_code, 
+        blood_type, 
+        allergies, 
+        current_medications, 
+        medical_conditions, 
+        emergency_contact_name, 
+        emergency_contact_phone, 
+        emergency_relationship,
+        email, 
+        phone,
+        created_at
+      FROM patients 
+      WHERE id = ?`,
+      [patientId]
+    );
+    const patientData = patientResult[0];
+
+    if (!patientData) {
+      return res.status(404).json({ error: 'Patient not found.' });
+    }
+
+    res.json(patientData);
+
+  } catch (error) {
+    console.error('Profile data error:', error);
+    res.status(500).json({ error: 'Failed to fetch profile data.', details: error.message });
+  }
+});
 module.exports = router;
