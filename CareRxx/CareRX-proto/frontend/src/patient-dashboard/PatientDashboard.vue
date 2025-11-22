@@ -1,5 +1,5 @@
 <template>
-  <DashboardLayout>
+  <DashboardLayout :userName="userName">
     <!-- Main content area for the dashboard -->
     <div class="dashboard-content">
       
@@ -28,6 +28,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router' // 1. Import useRoute
 import { DashboardLayout } from '../shared/components'
 import WelcomeBanner from './components/WelcomeBanner.vue'
 import QuickActions from './components/QuickActions.vue'
@@ -46,6 +47,7 @@ export default {
     ActivityFeed
   },
   setup() {
+    const route = useRoute() // 2. Get the route object
     const userName = ref('')
     const patientData = ref({})
     const upcomingAppointments = ref([])
@@ -53,8 +55,9 @@ export default {
 
     const fetchPatientData = async () => {
       try {
-        // Hardcoding patient ID to 2 for the prototype
-        const response = await fetch('http://localhost:3000/api/patients/2/dashboard')
+        // 3. Use the dynamic ID from the route
+        const patientId = route.params.id
+        const response = await fetch(`http://localhost:3000/api/patients/${patientId}/dashboard`)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }

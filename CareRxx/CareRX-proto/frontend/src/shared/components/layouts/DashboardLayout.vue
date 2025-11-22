@@ -5,17 +5,18 @@
         <i class="fas fa-heartbeat"></i>
         <span>CareRX</span>
       </div>
-      <ul class="sidebar-menu">
-        <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fas fa-calendar-alt"></i> Appointments</a></li>
-        <li><a href="#"><i class="fas fa-video"></i> Consultations</a></li>
-        <li><a href="#"><i class="fas fa-file-medical"></i> Medical Records</a></li>
-        <li><a href="#"><i class="fas fa-prescription"></i> E-Prescriptions</a></li>
-        <li><a href="#"><i class="fas fa-user"></i> My Profile</a></li>
-        <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-      </ul>
+        <ul class="sidebar-menu">
+          <li><router-link :to="`/dashboard/${userId}`"><i class="fas fa-home"></i> Dashboard</router-link></li>
+          <li><router-link :to="`/appointments/${userId}`"><i class="fas fa-calendar-alt"></i> Appointments</router-link></li>
+          <!-- In the <ul class="sidebar-menu"> -->
+          <li><router-link :to="`/consultations/${userId}`"><i class="fas fa-video"></i> Consultations</router-link></li>
+          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-file-medical"></i> Medical Records</a></li>
+          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-prescription"></i> E-Prescriptions</a></li>
+          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-user"></i> My Profile</a></li>
+          <li><a href="#" style="pointer-events: none; cursor: default;"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul> 
       <div class="sidebar-footer">
-        <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <button @click="logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </aside>
 
@@ -49,6 +50,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   userName: {
@@ -56,6 +58,12 @@ const props = defineProps({
     required: true
   }
 })
+
+const route = useRoute()
+const router = useRouter()
+
+// Get the user ID from the route parameters
+const userId = computed(() => route.params.id)
 
 const isSidebarOpen = ref(false)
 const hour = ref(new Date().getHours())
@@ -70,6 +78,13 @@ const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
 
+// Placeholder logout function
+const logout = () => {
+  // Implement actual logout logic here (e.g., clear tokens, redirect to login)
+  console.log('Logging out...')
+  router.push('/login')
+}
+
 onMounted(() => {
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
@@ -80,8 +95,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* FIX 1: Use Grid for desktop layout structure */
 .dashboard-layout {
-  display: flex;
+  display: flex; /* Kept for mobile/default flexibility */
   min-height: 100vh;
 }
 
@@ -94,7 +110,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease;
-  position: fixed;
+  position: fixed; /* Essential for mobile overlay */
   height: 100vh;
   z-index: 1000;
   transform: translateX(-100%);
@@ -141,7 +157,7 @@ onMounted(() => {
   transition: all 0.3s;
 }
 
-.sidebar-menu a:hover, .sidebar-menu a.active {
+.sidebar-menu a:hover, .sidebar-menu .router-link-active {
   background-color: var(--sidebar-hover);
   color: var(--white);
 }
@@ -158,17 +174,23 @@ onMounted(() => {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.sidebar-footer a {
+.sidebar-footer button {
   display: flex;
   align-items: center;
   color: rgba(255,255,255,0.6);
+  background: none;
+  border: none;
   text-decoration: none;
   padding: 12px 15px;
   border-radius: 8px;
   transition: all 0.3s;
+  cursor: pointer;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
 }
 
-.sidebar-footer a:hover {
+.sidebar-footer button:hover {
   color: var(--white);
 }
 
@@ -271,16 +293,29 @@ onMounted(() => {
   color: var(--primary-color);
 }
 
+/* FIX 2: Apply the correct desktop layout using CSS Grid */
 @media (min-width: 769px) {
+  .dashboard-layout {
+    display: grid;
+    /* FIX: Define the fixed sidebar (260px) and the main content (1fr) columns */
+    grid-template-columns: 260px 1fr;
+  }
+  
   .sidebar {
-    position: static;
-    transform: translateX(0);
+    position: static; /* FIX: Sidebar is no longer a fixed overlay */
+    transform: translateX(0); 
+    height: 100%; /* Ensure sidebar stretches to full height of grid row */
+    grid-column: 1; /* Place sidebar in the first column */
   }
+  
   .main-content {
-    margin-left: 260px;
+    /* FIX: Remove margin-left which caused the content to shift too far right */
+    margin-left: 0; 
+    grid-column: 2; /* Place main content in the second column */
   }
+  
   .menu-toggle {
-    display: none;
+    display: none; /* Hide the hamburger menu on desktop */
   }
 }
 </style>
