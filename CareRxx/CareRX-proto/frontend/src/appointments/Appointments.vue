@@ -4,117 +4,68 @@
       <header class="content-header">
         <h1 class="page-title">My Appointments</h1>
         <div class="header-actions">
-          <button class="btn btn-outline" @click="toggleFilters">
-            <i class="fas fa-filter"></i> Filter
+          <button class="btn btn-primary" @click="openBookingModal">
+            <i class="fas fa-plus"></i> Book New Consultation
           </button>
-          <a href="https://carerxinfo.youcanbook.me/" target="_blank" class="btn btn-primary">
-            <i class="fas fa-plus"></i> New Appointment
-          </a>
         </div>
       </header>
 
-    <!-- Tabs -->
-      <AppointmentTabs
-        :tabs="tabs"
-        :active-tab="activeTab"
-        @tab-changed="activeTab = $event"
+      <AppointmentList
+        :appointments="appointments"
+        @view-details="openDetailsModal"
       />
-
-      <!-- Filters -->
-      <div class="filters" v-show="showFilters">
-        <!-- Filter controls can be added here -->
-      </div>
-
-      <!-- Appointments List -->
-      <div class="appointments-list">
-        <template v-if="currentAppointments.length > 0">
-          <AppointmentCard
-            v-for="appointment in currentAppointments"
-            :key="appointment.id"
-            :appointment="appointment"
-          >
-            <template #actions>
-              <button class="btn btn-outline">Reschedule</button>
-              <button class="btn btn-outline">Cancel</button>
-              <a v-if="appointment.meeting_url" :href="appointment.meeting_url" target="_blank" class="btn btn-primary">Join Video Call</a>
-            </template>
-          </AppointmentCard>
-        </template>
-        <EmptyState
-          v-else
-          :icon-class="emptyStateIcon"
-          :title="emptyStateTitle"
-          :message="emptyStateMessage"
-        >
-          <a href="https://carerxinfo.youcanbook.me/" target="_blank" class="btn btn-primary" v-if="activeTab === 'upcoming'">
-            <i class="fas fa-plus"></i> Book an Appointment
-          </a>
-        </EmptyState>
-      </div>
     </div>
+
+    <!-- The modal is now passed the patientId from the route -->
+    <BookAppointmentModal 
+      ref="bookingModal" 
+      :patient-id="parseInt(route.params.id)"
+      @booking-success="fetchAppointments"
+    />
   </DashboardLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { getAppointments } from '../api/index.js'
 import { DashboardLayout } from '../shared/components'
-import AppointmentCard from './components/AppointmentCard.vue'
-import AppointmentTabs from './components/AppointmentTabs.vue'
-import EmptyState from './components/EmptyState.vue'
+import AppointmentList from './components/AppointmentList.vue'
+import BookAppointmentModal from './components/BookAppointmentModal.vue';
 
 const route = useRoute()
 const userName = ref('')
 const appointments = ref([])
-const activeTab = ref('upcoming')
-const showFilters = ref(false)
 
-const tabs = [
-  { name: 'upcoming', label: 'Upcoming' },
-  { name: 'past', label: 'Past' },
-  { name: 'cancelled', label: 'Cancelled' }
-]
-
-const currentAppointments = computed(() => {
-  return appointments.value.filter(apt => apt.status === activeTab.value)
-})
-
-const emptyStateIcon = computed(() => {
-  switch (activeTab.value) {
-    case 'upcoming': return 'fas fa-calendar-times'
-    case 'past': return 'fas fa-history'
-    case 'cancelled': return 'fas fa-ban'
-    default: return 'fas fa-calendar-times'
-  }
-})
-
-const emptyStateTitle = computed(() => `No ${activeTab.value} appointments`)
-const emptyStateMessage = computed(() => `You don't have any ${activeTab.value} appointments.`)
+// This ref gives us access to the modal component's methods
+const bookingModal = ref(null);
 
 const fetchAppointments = async () => {
   const patientId = route.params.id
   try {
-    const response = await fetch(`http://localhost:3000/api/patients/${patientId}/appointments`)
-    if (!response.ok) throw new Error('Failed to fetch appointments')
-    const data = await response.json()
-    
-    // Set user name and appointments from the new API response structure
-    userName.value = data.patient_first_name || 'Patient'
-    appointments.value = data.appointments
+    const response = await getAppointments(patientId); 
+    userName.value = response.data.patient_first_name || 'Patient' 
+    appointments.value = response.data.appointments || []
   } catch (error) {
-    console.error(error)
+    console.error('Failed to fetch appointments:', error.response ? error.response.data : error.message);
+    alert('Could not load appointments. Please check the console for more details.');
   }
 }
-const toggleFilters = () => {
-  showFilters.value = !showFilters.value
-}
+
+const openBookingModal = () => {
+  bookingModal.value.openModal();
+};
+
+const openDetailsModal = (appointment) => {
+  alert(`Viewing details for appointment with Dr. ${appointment.doctor}`);
+};
 
 onMounted(() => {
   fetchAppointments()
 })
 </script>
-
 <style scoped>
+/* Styles remain the same */
 .appointments-content {
   padding: 30px;
 }
@@ -145,7 +96,6 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
 }
 .btn-primary {
   background-color: var(--primary-color);
@@ -154,23 +104,4 @@ onMounted(() => {
 .btn-primary:hover {
   background-color: var(--primary-dark);
 }
-.btn-outline {
-  background-color: transparent;
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-}
-.btn-outline:hover {
-  background-color: var(--primary-light);
-}
-.filters {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
-.appointments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-</style>    
+</style>

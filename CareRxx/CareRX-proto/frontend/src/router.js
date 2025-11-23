@@ -9,17 +9,19 @@ import Consultations from './consultations/Consultations.vue'
 import MedicalRecords from './medical-records/MedicalRecords.vue'
 import EPrescriptions from './e-prescriptions/EPrescriptions.vue'
 import PatientProfile from './patient-profile/PatientProfile.vue'
+// REMOVED: The import for the deleted BookAppointment.vue file
+// import BookAppointment from './appointments/components/BookAppointment.vue' 
 
 const routes = [
   {
-  path: '/',
-  component: LandingPage,
-  meta: { title: 'CareRX' }
+    path: '/',
+    component: LandingPage,
+    meta: { title: 'CareRX' }
   },
   {
-  path: '/dashboard/:id',
-  component: PatientDashboard,
-  meta: { title: 'Dashboard - CareRX' }
+    path: '/dashboard/:id',
+    component: PatientDashboard,
+    meta: { title: 'Dashboard - CareRX' }
   },
   { 
     path: '/signup', 
@@ -36,31 +38,38 @@ const routes = [
     component: PatientDashboard,
     meta: { title: 'Dashboard - CareRX' }
   },
-    {
-  path: '/appointments/:id',
-  component: Appointments,
-  meta: { title: 'Appointments - CareRX' }
-},
-{
-  path: '/consultations/:id',
-  component: Consultations,
-  meta: { title: 'Consultations - CareRX' }
-},
-{
-  path: '/medical-records/:id',
-  component: MedicalRecords,
-  meta: { title: 'Medical Records - CareRX' }
-},
-{
-  path: '/e-prescriptions/:id',
-  component: EPrescriptions,
-  meta: { title: 'E-Prescriptions - CareRX' }
-},
-{
-  path: '/patient-profile/:id',
-  component: PatientProfile,
-  meta: { title: 'My Profile - CareRX' }
-}
+  {
+    path: '/appointments/:id',
+    component: Appointments,
+    meta: { title: 'Appointments - CareRX' }
+  },
+  {
+    path: '/consultations/:id',
+    component: Consultations,
+    meta: { title: 'Consultations - CareRX' }
+  },
+  {
+    path: '/medical-records/:id',
+    component: MedicalRecords,
+    meta: { title: 'Medical Records - CareRX' }
+  },
+  {
+    path: '/e-prescriptions/:id',
+    component: EPrescriptions,
+    meta: { title: 'E-Prescriptions - CareRX' }
+  },
+  {
+    path: '/patient-profile/:id',
+    component: PatientProfile,
+    meta: { title: 'My Profile - CareRX' }
+  },
+  // REMOVED: The obsolete route for booking appointments
+  // {
+  //   path: '/patients/:id/appointments/book',
+  //   name: 'BookAppointment',
+  //   component: BookAppointment, // This component no longer exists
+  //   meta: { requiresAuth: true }
+  // },
 ]
 
 const router = createRouter({

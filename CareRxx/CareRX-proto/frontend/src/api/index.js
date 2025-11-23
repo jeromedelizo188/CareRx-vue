@@ -1,47 +1,52 @@
 import axios from 'axios';
 
-// Create a base Axios instance with the backend server URL
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000/api', // Your backend server URL
+  baseURL: 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// --- Authentication API Calls ---
+// --- Auth ---
+export const login = (email, password) => apiClient.post('/auth/login', { email, password });
+export const register = (userData) => apiClient.post('/auth/register', userData);
 
+// --- Patient Data ---
+export const getPatientDashboard = (patientId) => apiClient.get(`/patients/${patientId}/dashboard`);
+export const getAppointments = (patientId) => apiClient.get(`/patients/${patientId}/appointments`);
+export const getPatientConsultations = (patientId) => apiClient.get(`/patients/${patientId}/consultations`);
+// ... other patient API calls
+
+// --- NEW: Consultation Booking ---
 /**
- * Logs in a user.
- * @param {string} email - The user's email.
- * @param {string} password - The user's password.
- * @returns {Promise<object>} A promise that resolves to the login response.
+ * Creates a new consultation.
+ * @param {object} consultationData - The consultation data { doctor_id, consultation_type, consultation_date, notes }.
+ * @param {number} patientId - The ID of the patient booking the consultation.
+ * @returns {Promise<object>} A promise that resolves to the creation response.
  */
-export const login = (email, password) => {
-  return apiClient.post('/auth/login', { email, password });
+export const createConsultation = (patientId, consultationData) => {
+  return apiClient.post(`/patients/${patientId}/consultations`, consultationData);
 };
 
 /**
- * Registers a new user.
- * @param {object} userData - The user's registration data.
- * @returns {Promise<object>} A promise that resolves to the registration response.
+ * Fetches a list of all active doctors.
+ * @returns {Promise<object>} A promise that resolves to the list of doctors.
  */
-export const register = (userData) => {
-  return apiClient.post('/auth/register', userData);
+export const getDoctors = () => {
+  return apiClient.get('/doctors');
 };
-
-
-// --- Patient Data API Calls ---
 
 /**
- * Fetches dashboard data for a specific patient.
- * @param {number} patientId - The ID of the patient.
- * @returns {Promise<object>} A promise that resolves to the patient's dashboard data.
+ * Fetches availability for a specific doctor.
+ * @param {number} doctorId - The ID of the doctor.
+ * @param {string} startDate - The start date to check availability (optional).
+ * @param {string} endDate - The end date to check availability (optional).
+ * @returns {Promise<object>} A promise that resolves to the doctor's availability.
  */
-export const getPatientDashboard = (patientId) => {
-  return apiClient.get(`/patients/${patientId}/dashboard`);
+export const getDoctorAvailability = (doctorId, startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+  
+  return apiClient.get(`/doctors/${doctorId}/availability?${params.toString()}`);
 };
-
-// You can add other API calls here in the future
-// export const getAppointments = (patientId) => {
-//   return apiClient.get(`/patients/${patientId}/appointments`);
-// };

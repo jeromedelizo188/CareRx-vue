@@ -38,8 +38,10 @@ app.get('/test-db', async (req, res) => {
 });
 
 // API Routes
+const doctorRoutes = require('./routes/doctors'); // Require the new doctor routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/patients', require('./routes/patients'));
+app.use('/api/doctors', doctorRoutes); // Use the new doctor routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
